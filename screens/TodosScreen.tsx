@@ -30,6 +30,7 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
         <View style={styles.headerView}>
           <Text style={styles.titleText}>Todo List</Text>
           <TouchableOpacity
+            testID="plus-button"
             onPress={() => navigation.navigate('EditTodoScreen')}
           >
             <Plus stroke="green" fill="#fff" width={30} height={30} />
@@ -39,9 +40,9 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
           data={todos}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <View style={styles.todoViewContainer}>
+            <View testID={`todo-item-${item.id}`} style={styles.todoViewContainer}>
               {item.isCompleted && (
-                <View style={styles.todoViewCheckCircle}>
+                <View testID={`check-circle-${item.id}`} style={styles.todoViewCheckCircle}>
                   <CheckCircle
                     stroke="green"
                     fill="#fff"
@@ -77,6 +78,7 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
               </View>
               <View style={styles.todoViewIcons}>
                 <Edit2
+                  testID={`edit-button-${item.id}`}
                   onPress={() => handleEditTodo(item)}
                   stroke={item.isCompleted ? 'gray' : 'blue'}
                   fill="#fff"
@@ -85,6 +87,7 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
                   disabled={item.isCompleted}
                 />
                 <Trash2
+                  testID={`delete-button-${item.id}`}
                   onPress={() => deleteTodo(item.id)}
                   stroke={item.isCompleted ? 'gray' : 'red'}
                   fill="#fff"
