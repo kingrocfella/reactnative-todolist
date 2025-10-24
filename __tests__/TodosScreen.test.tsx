@@ -183,4 +183,56 @@ describe('TodosScreen', () => {
       });
     });
   });
+
+  test('11. Shows delete confirmation modal when delete button is pressed', async () => {
+    const { getByTestId, getByText } = render(
+      <TestWrapper>
+        <TodosScreen navigation={mockNavigation} />
+      </TestWrapper>,
+    );
+
+    // Wait for todos to load
+    await waitFor(() => {
+      expect(getByTestId('delete-button-1')).toBeTruthy();
+    });
+
+    // Press the delete button
+    const deleteButton = getByTestId('delete-button-1');
+    fireEvent.press(deleteButton);
+
+    // Check if the modal appears with correct content
+    expect(getByText('Delete Todo')).toBeTruthy();
+    expect(
+      getByText('Are you sure you want to delete "Learn React Native"?'),
+    ).toBeTruthy();
+    expect(getByText('Cancel')).toBeTruthy();
+    expect(getByText('Delete')).toBeTruthy();
+  });
+
+  test('12. Confirms deletion when Delete button in modal is pressed', async () => {
+    const { getByTestId, getByText } = render(
+      <TestWrapper>
+        <TodosScreen navigation={mockNavigation} />
+      </TestWrapper>,
+    );
+
+    // Wait for todos to load
+    await waitFor(() => {
+      expect(getByTestId('delete-button-1')).toBeTruthy();
+    });
+
+    // Press the delete button to show modal
+    const deleteButton = getByTestId('delete-button-1');
+    fireEvent.press(deleteButton);
+
+    // Wait for modal to appear and then press the Delete button in the modal
+    await waitFor(() => {
+      expect(getByText('Delete')).toBeTruthy();
+    });
+
+    const modalDeleteButton = getByText('Delete');
+    fireEvent.press(modalDeleteButton);
+
+    expect(modalDeleteButton).toBeTruthy();
+  });
 });

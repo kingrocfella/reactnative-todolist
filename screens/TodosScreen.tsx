@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trash2, Edit2, CheckCircle, Plus } from 'react-native-feather';
 import { useTodos } from '../contexts/TodoContext';
+import { ConfirmationModal } from '../components';
 
 export interface Todo {
   id: string;
@@ -19,9 +20,35 @@ export interface Todo {
 
 export const TodosScreen = ({ navigation }: { navigation: any }) => {
   const { todos, toggleTodo, deleteTodo } = useTodos();
+  const [deleteModal, setDeleteModal] = useState<{
+    visible: boolean;
+    todoId: string;
+    todoTitle: string;
+  }>({
+    visible: false,
+    todoId: '',
+    todoTitle: '',
+  });
 
   const handleEditTodo = (item: Todo) => {
     navigation.navigate('EditTodoScreen', { ...item });
+  };
+
+  const handleDeleteTodo = (id: string, title: string) => {
+    setDeleteModal({
+      visible: true,
+      todoId: id,
+      todoTitle: title,
+    });
+  };
+
+  const confirmDelete = () => {
+    deleteTodo(deleteModal.todoId);
+    setDeleteModal({ visible: false, todoId: '', todoTitle: '' });
+  };
+
+  const cancelDelete = () => {
+    setDeleteModal({ visible: false, todoId: '', todoTitle: '' });
   };
 
   return (
@@ -40,9 +67,15 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
           data={todos}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <View testID={`todo-item-${item.id}`} style={styles.todoViewContainer}>
+            <View
+              testID={`todo-item-${item.id}`}
+              style={styles.todoViewContainer}
+            >
               {item.isCompleted && (
-                <View testID={`check-circle-${item.id}`} style={styles.todoViewCheckCircle}>
+                <View
+                  testID={`check-circle-${item.id}`}
+                  style={styles.todoViewCheckCircle}
+                >
                   <CheckCircle
                     stroke="green"
                     fill="#fff"
@@ -88,7 +121,7 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
                 />
                 <Trash2
                   testID={`delete-button-${item.id}`}
-                  onPress={() => deleteTodo(item.id)}
+                  onPress={() => handleDeleteTodo(item.id, item.name)}
                   stroke={item.isCompleted ? 'gray' : 'red'}
                   fill="#fff"
                   width={20}
@@ -100,6 +133,17 @@ export const TodosScreen = ({ navigation }: { navigation: any }) => {
           )}
         />
       </View>
+
+      <ConfirmationModal
+        visible={deleteModal.visible}
+        title="Delete Todo"
+        message={`Are you sure you want to delete "${deleteModal.todoTitle}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmButtonColor="#dc3545"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </SafeAreaView>
   );
 };
